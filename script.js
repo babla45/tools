@@ -21,7 +21,22 @@ const tools = [
     "reverse string",
     "reverse array",
     "reverse array of strings",
-    "sort array of strings"
+    "sort array of strings",
+    "roman to decimal",
+    "decimal to roman",
+    "count digits",
+    "greatest in array",
+    "smallest in array",
+    "average of array",
+    "base converter",
+    "base64 encoder",
+    "base64 decoder",
+    "custom base converter",
+    "set operations",
+    "frequency counter",
+    "character frequency",
+    "unique elements",
+    "base math operations"
 ];
 
 // Remove duplicates from the list
@@ -33,6 +48,17 @@ const toolSearch = document.getElementById('toolSearch');
 const inputArea = document.getElementById('inputArea');
 const resultArea = document.getElementById('resultArea');
 const resultDisplay = document.getElementById('result');
+
+// Check if all DOM elements exist
+if (!toolSelect || !toolSearch || !inputArea || !resultArea || !resultDisplay) {
+    console.error("Some DOM elements were not found:", {
+        toolSelect: !!toolSelect,
+        toolSearch: !!toolSearch,
+        inputArea: !!inputArea,
+        resultArea: !!resultArea,
+        resultDisplay: !!resultDisplay
+    });
+}
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', initPage);
@@ -50,6 +76,15 @@ function initPage() {
     toolSelect.addEventListener('change', function() {
         hideCustomDropdown();
         updateInputArea();
+    });
+    
+    // Check if DOM elements exist
+    console.log("DOM elements:", {
+        toolSelect: !!toolSelect,
+        toolSearch: !!toolSearch,
+        inputArea: !!inputArea,
+        resultArea: !!resultArea,
+        resultDisplay: !!resultDisplay
     });
 }
 
@@ -317,7 +352,6 @@ Or: 5 10 15 20" class="${textareaClass}"></textarea>
             document.getElementById('numberInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
         case "palindrome check":
-        case "reverse string":
             inputHTML += `
                 <label for="textInput" class="${labelClass}">Enter text:</label>
                 <textarea id="textInput" placeholder="Enter text" class="${textareaClass}"></textarea>
@@ -339,6 +373,192 @@ Or: apple banana cherry" class="${textareaClass}"></textarea>
             inputArea.innerHTML = inputHTML;
             document.getElementById('arrayInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
+        case "greatest in array":
+        case "smallest in array":
+        case "average of array":
+            inputHTML += `
+                <label for="arrayInput" class="${labelClass}">Enter numbers (one per line or space-separated):</label>
+                <textarea id="arrayInput" placeholder="Example:
+5
+10
+15
+20
+
+Or: 5 10 15 20" class="${textareaClass}"></textarea>
+            `;
+            inputArea.innerHTML = inputHTML;
+            document.getElementById('arrayInput').addEventListener('input', () => calculateResult(selectedTool));
+            break;
+        case "base converter":
+            inputHTML += `
+                <label for="numberInput" class="${labelClass}">Enter a number:</label>
+                <textarea id="numberInput" placeholder="Enter a number" class="${textareaClass}"></textarea>
+                <label for="baseSelect" class="${labelClass}">Select the original base:</label>
+                <select id="baseSelect" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="2">Binary (Base 2)</option>
+                    <option value="8">Octal (Base 8)</option>
+                    <option value="10" selected>Decimal (Base 10)</option>
+                    <option value="16">Hexadecimal (Base 16)</option>
+                </select>
+            `;
+            inputArea.innerHTML = inputHTML;
+            document.getElementById('numberInput').addEventListener('input', () => calculateResult(selectedTool));
+            document.getElementById('baseSelect').addEventListener('change', () => calculateResult(selectedTool));
+            break;
+        case "base64 encoder":
+            inputHTML += `
+                <label for="textInput" class="${labelClass}">Enter text to encode:</label>
+                <textarea id="textInput" placeholder="Enter text" class="${textareaClass}"></textarea>
+            `;
+            inputArea.innerHTML = inputHTML;
+            document.getElementById('textInput').addEventListener('input', () => calculateResult(selectedTool));
+            break;
+        case "base64 decoder":
+            inputHTML += `
+                <label for="base64Input" class="${labelClass}">Enter Base64 string to decode:</label>
+                <textarea id="base64Input" placeholder="Enter Base64 string" class="${textareaClass}"></textarea>
+            `;
+            inputArea.innerHTML = inputHTML;
+            document.getElementById('base64Input').addEventListener('input', () => calculateResult(selectedTool));
+            break;
+        case "custom base converter":
+            inputHTML += `
+                <label for="numberInput" class="${labelClass}">Enter a number:</label>
+                <textarea id="numberInput" placeholder="Enter a number" class="${textareaClass}"></textarea>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="fromBaseInput" class="${labelClass}">From Base (2-36):</label>
+                        <input type="number" id="fromBaseInput" min="2" max="36" value="10" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="toBaseInput" class="${labelClass}">To Base (2-36):</label>
+                        <input type="number" id="toBaseInput" min="2" max="36" value="16" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                </div>
+            `;
+            inputArea.innerHTML = inputHTML;
+            document.getElementById('numberInput').addEventListener('input', () => calculateResult(selectedTool));
+            document.getElementById('fromBaseInput').addEventListener('input', () => calculateResult(selectedTool));
+            document.getElementById('toBaseInput').addEventListener('input', () => calculateResult(selectedTool));
+            break;
+        case "set operations":
+            inputHTML += `
+                <label for="set1Input" class="${labelClass}">Enter first set (comma or space separated):</label>
+                <textarea id="set1Input" placeholder="Example: 1, 2, 3, 4 or 1 2 3 4" class="${textareaClass}"></textarea>
+                <label for="set2Input" class="${labelClass}">Enter second set (comma or space separated):</label>
+                <textarea id="set2Input" placeholder="Example: 3, 4, 5, 6 or 3 4 5 6" class="${textareaClass}"></textarea>
+            `;
+            inputArea.innerHTML = inputHTML;
+            document.getElementById('set1Input').addEventListener('input', () => calculateResult(selectedTool));
+            document.getElementById('set2Input').addEventListener('input', () => calculateResult(selectedTool));
+            break;
+            
+        case "frequency counter":
+            inputHTML += `
+                <label for="arrayInput" class="${labelClass}">Enter numbers (comma, space or line separated):</label>
+                <textarea id="arrayInput" placeholder="Example: 1, 2, 3, 2, 1, 4, 5, 2" class="${textareaClass}"></textarea>
+            `;
+            inputArea.innerHTML = inputHTML;
+            document.getElementById('arrayInput').addEventListener('input', () => calculateResult(selectedTool));
+            break;
+            
+        case "character frequency":
+            inputHTML += `
+                <label for="textInput" class="${labelClass}">Enter text:</label>
+                <textarea id="textInput" placeholder="Enter text to count character frequency" class="${textareaClass}"></textarea>
+            `;
+            inputArea.innerHTML = inputHTML;
+            document.getElementById('textInput').addEventListener('input', () => calculateResult(selectedTool));
+            break;
+            
+        case "unique elements":
+            inputHTML += `
+                <label for="arrayInput" class="${labelClass}">Enter elements (comma, space or line separated):</label>
+                <textarea id="arrayInput" placeholder="Example: apple, banana, apple, orange, banana" class="${textareaClass}"></textarea>
+            `;
+            inputArea.innerHTML = inputHTML;
+            document.getElementById('arrayInput').addEventListener('input', () => calculateResult(selectedTool));
+            break;
+        case "base math operations":
+            inputHTML += `
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="firstNumInput" class="${labelClass}">First Number:</label>
+                        <textarea id="firstNumInput" placeholder="Enter first number" class="${textareaClass}"></textarea>
+                        <label for="firstBaseSelect" class="${labelClass}">Base of first number:</label>
+                        <select id="firstBaseSelect" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="2">Binary (Base 2)</option>
+                            <option value="8">Octal (Base 8)</option>
+                            <option value="10" selected>Decimal (Base 10)</option>
+                            <option value="16">Hexadecimal (Base 16)</option>
+                            <option value="custom">Custom Base</option>
+                        </select>
+                        <div id="firstCustomBase" class="hidden">
+                            <label for="firstCustomBaseInput" class="${labelClass}">Specify Custom Base (2-36):</label>
+                            <input type="number" id="firstCustomBaseInput" min="2" max="36" value="10" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="secondNumInput" class="${labelClass}">Second Number:</label>
+                        <textarea id="secondNumInput" placeholder="Enter second number" class="${textareaClass}"></textarea>
+                        <label for="secondBaseSelect" class="${labelClass}">Base of second number:</label>
+                        <select id="secondBaseSelect" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="2">Binary (Base 2)</option>
+                            <option value="8">Octal (Base 8)</option>
+                            <option value="10" selected>Decimal (Base 10)</option>
+                            <option value="16">Hexadecimal (Base 16)</option>
+                            <option value="custom">Custom Base</option>
+                        </select>
+                        <div id="secondCustomBase" class="hidden">
+                            <label for="secondCustomBaseInput" class="${labelClass}">Specify Custom Base (2-36):</label>
+                            <input type="number" id="secondCustomBaseInput" min="2" max="36" value="10" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+                <label for="operationSelect" class="${labelClass}">Operation:</label>
+                <select id="operationSelect" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="add" selected>Addition (+)</option>
+                    <option value="subtract">Subtraction (-)</option>
+                    <option value="multiply">Multiplication (×)</option>
+                    <option value="divide">Division (÷)</option>
+                    <option value="modulo">Modulo (remainder) (%)</option>
+                </select>
+            `;
+            inputArea.innerHTML = inputHTML;
+            
+            // Add event listeners
+            document.getElementById('firstNumInput').addEventListener('input', () => calculateResult(selectedTool));
+            document.getElementById('secondNumInput').addEventListener('input', () => calculateResult(selectedTool));
+            document.getElementById('firstBaseSelect').addEventListener('change', function() {
+                const customBaseDiv = document.getElementById('firstCustomBase');
+                if (this.value === 'custom') {
+                    customBaseDiv.classList.remove('hidden');
+                } else {
+                    customBaseDiv.classList.add('hidden');
+                }
+                calculateResult(selectedTool);
+            });
+            document.getElementById('secondBaseSelect').addEventListener('change', function() {
+                const customBaseDiv = document.getElementById('secondCustomBase');
+                if (this.value === 'custom') {
+                    customBaseDiv.classList.remove('hidden');
+                } else {
+                    customBaseDiv.classList.add('hidden');
+                }
+                calculateResult(selectedTool);
+            });
+            document.getElementById('operationSelect').addEventListener('change', () => calculateResult(selectedTool));
+            
+            // Add event listeners for custom base inputs if they exist
+            const firstCustomBaseInput = document.getElementById('firstCustomBaseInput');
+            const secondCustomBaseInput = document.getElementById('secondCustomBaseInput');
+            if (firstCustomBaseInput) {
+                firstCustomBaseInput.addEventListener('input', () => calculateResult(selectedTool));
+            }
+            if (secondCustomBaseInput) {
+                secondCustomBaseInput.addEventListener('input', () => calculateResult(selectedTool));
+            }
+            break;
         default:
             inputArea.innerHTML = `
                 <h3 class="text-lg font-semibold text-primary mb-4">Input</h3>
@@ -354,7 +574,7 @@ function calculateResult(tool) {
     
     // Helper function to parse input that can be either space or newline separated
     const parseInput = (input) => {
-        return input.trim().split(/[\s\n]+/);
+        return input.trim().split(/[\s,\n]+/).filter(item => item !== '');
     };
     
     switch(tool) {
@@ -413,9 +633,9 @@ function calculateResult(tool) {
             resultClass = series.length > 0 ? 'text-blue-600' : 'text-gray-600';
             break;
         case "palindrome check":
-            const text = document.getElementById('textInput').value;
-            const isPalindromeResult = isPalindrome(text);
-            result = `"${text}" is ${isPalindromeResult ? '' : 'not '}a palindrome.`;
+            const palindromeText = document.getElementById('textInput').value;
+            const isPalindromeResult = isPalindrome(palindromeText);
+            result = `"${palindromeText}" is ${isPalindromeResult ? '' : 'not '}a palindrome.`;
             resultClass = isPalindromeResult ? 'text-emerald-600' : 'text-rose-600';
             break;
         case "armstrong number":
@@ -489,6 +709,285 @@ function calculateResult(tool) {
             const sortedStringArray = sortArrayOfStrings(stringArrayToSort);
             result = `Sorted array of strings: [${sortedStringArray.join(', ')}]`;
             resultClass = sortedStringArray.length > 0 ? 'text-emerald-600' : 'text-blue-600';
+            break;
+        case "greatest in array":
+            const arrayForMax = parseInput(document.getElementById('arrayInput').value).map(Number);
+            const maxResult = Math.max(...arrayForMax);
+            result = `Greatest number in array [${arrayForMax.join(', ')}]: ${maxResult}`;
+            resultClass = 'text-emerald-600';
+            break;
+        case "smallest in array":
+            const arrayForMin = parseInput(document.getElementById('arrayInput').value).map(Number);
+            const minResult = Math.min(...arrayForMin);
+            result = `Smallest number in array [${arrayForMin.join(', ')}]: ${minResult}`;
+            resultClass = 'text-emerald-600';
+            break;
+        case "average of array":
+            const arrayForAvg = parseInput(document.getElementById('arrayInput').value).map(Number);
+            const avgResult = arrayForAvg.reduce((sum, num) => sum + num, 0) / arrayForAvg.length;
+            result = `Average of array [${arrayForAvg.join(', ')}]: ${avgResult.toFixed(2)}`;
+            resultClass = 'text-emerald-600';
+            break;
+        case "base converter":
+            const numToConvert = document.getElementById('numberInput').value.trim();
+            const originalBase = parseInt(document.getElementById('baseSelect').value);
+            
+            if (!numToConvert) {
+                result = "Please enter a number";
+                resultClass = 'text-gray-600';
+                break;
+            }
+            
+            try {
+                const decimalValue = parseInt(numToConvert, originalBase);
+                const binary = decimalValue.toString(2);
+                const octal = decimalValue.toString(8);
+                const decimal = decimalValue.toString(10);
+                const hex = decimalValue.toString(16).toUpperCase();
+                
+                result = `Binary: ${binary}\nOctal: ${octal}\nDecimal: ${decimal}\nHexadecimal: ${hex}`;
+                resultClass = 'text-blue-600 whitespace-pre-line';
+            } catch (e) {
+                result = "Invalid number for the selected base";
+                resultClass = 'text-rose-600';
+            }
+            break;
+        case "base64 encoder":
+            const textToEncode = document.getElementById('textInput').value;
+            try {
+                const encoded = btoa(textToEncode);
+                result = `Base64 encoded: ${encoded}`;
+                resultClass = 'text-blue-600';
+            } catch (e) {
+                result = "Error encoding to Base64. Make sure input contains only ASCII characters.";
+                resultClass = 'text-rose-600';
+            }
+            break;
+        case "base64 decoder":
+            const base64ToDecode = document.getElementById('base64Input').value.trim();
+            try {
+                const decoded = atob(base64ToDecode);
+                result = `Decoded text: ${decoded}`;
+                resultClass = 'text-blue-600';
+            } catch (e) {
+                result = "Error decoding Base64. Make sure input is valid Base64.";
+                resultClass = 'text-rose-600';
+            }
+            break;
+        case "custom base converter":
+            const customNumToConvert = document.getElementById('numberInput').value.trim();
+            const fromBase = parseInt(document.getElementById('fromBaseInput').value);
+            const toBase = parseInt(document.getElementById('toBaseInput').value);
+            
+            if (!customNumToConvert) {
+                result = "Please enter a number";
+                resultClass = 'text-gray-600';
+                break;
+            }
+            
+            if (fromBase < 2 || fromBase > 36 || toBase < 2 || toBase > 36) {
+                result = "Base must be between 2 and 36";
+                resultClass = 'text-rose-600';
+                break;
+            }
+            
+            try {
+                const decimalValue = parseInt(customNumToConvert, fromBase);
+                const convertedValue = decimalValue.toString(toBase).toUpperCase();
+                
+                // Also convert to standard bases
+                const binaryValue = decimalValue.toString(2);
+                const octalValue = decimalValue.toString(8);
+                const decimalDisplay = decimalValue.toString(10);
+                const hexValue = decimalValue.toString(16).toUpperCase();
+                
+                result = `${customNumToConvert} (Base ${fromBase}) = ${convertedValue} (Base ${toBase})\n\n` +
+                         `Standard Bases:\n` +
+                         `Binary (Base 2): ${binaryValue}\n` +
+                         `Octal (Base 8): ${octalValue}\n` +
+                         `Decimal (Base 10): ${decimalDisplay}\n` +
+                         `Hexadecimal (Base 16): ${hexValue}`;
+                resultClass = 'text-blue-600 whitespace-pre-line';
+            } catch (e) {
+                result = "Invalid number for the selected base";
+                resultClass = 'text-rose-600';
+            }
+            break;
+        case "set operations":
+            const set1Input = document.getElementById('set1Input').value;
+            const set2Input = document.getElementById('set2Input').value;
+            
+            // Parse inputs, remove duplicates
+            const set1 = new Set(parseInput(set1Input));
+            const set2 = new Set(parseInput(set2Input));
+            
+            // Perform set operations
+            const union = [...new Set([...set1, ...set2])];
+            
+            const intersection = [...set1].filter(item => set2.has(item));
+            
+            const difference1 = [...set1].filter(item => !set2.has(item));
+            const difference2 = [...set2].filter(item => !set1.has(item));
+            
+            const symmetricDifference = [...difference1, ...difference2];
+            
+            result = `Set 1: [${[...set1].join(', ')}]\n` +
+                     `Set 2: [${[...set2].join(', ')}]\n\n` +
+                     `Union: [${union.join(', ')}]\n` + 
+                     `Intersection: [${intersection.join(', ')}]\n` +
+                     `Difference (Set1 - Set2): [${difference1.join(', ')}]\n` +
+                     `Difference (Set2 - Set1): [${difference2.join(', ')}]\n` +
+                     `Symmetric Difference: [${symmetricDifference.join(', ')}]`;
+            resultClass = 'text-blue-600 whitespace-pre-line';
+            break;
+            
+        case "frequency counter":
+            const numbersInput = document.getElementById('arrayInput').value;
+            const numbers = parseInput(numbersInput);
+            
+            const frequencyMap = {};
+            numbers.forEach(num => {
+                frequencyMap[num] = (frequencyMap[num] || 0) + 1;
+            });
+            
+            // Format the result
+            const frequencyResult = Object.entries(frequencyMap)
+                .sort((a, b) => b[1] - a[1]) // Sort by frequency (highest first)
+                .map(([number, count]) => `${number}: ${count}`)
+                .join('\n');
+            
+            result = `Frequency of elements:\n${frequencyResult}`;
+            resultClass = 'text-blue-600 whitespace-pre-line';
+            break;
+            
+        case "character frequency":
+            const freqText = document.getElementById('textInput').value;
+            
+            const charFrequency = {};
+            for (const char of freqText) {
+                if (char !== ' ' && char !== '\n') {
+                    charFrequency[char] = (charFrequency[char] || 0) + 1;
+                }
+            }
+            
+            // Format the result
+            const charFreqResult = Object.entries(charFrequency)
+                .sort((a, b) => b[1] - a[1]) // Sort by frequency (highest first)
+                .map(([char, count]) => `'${char}': ${count}`)
+                .join('\n');
+            
+            result = `Character frequency:\n${charFreqResult}`;
+            resultClass = 'text-blue-600 whitespace-pre-line';
+            break;
+            
+        case "unique elements":
+            const elements = parseInput(document.getElementById('arrayInput').value);
+            const uniqueElements = [...new Set(elements)];
+            
+            result = `Original elements: [${elements.join(', ')}]\n` +
+                     `Unique elements: [${uniqueElements.join(', ')}]\n` +
+                     `Number of unique elements: ${uniqueElements.length}`;
+            resultClass = 'text-blue-600 whitespace-pre-line';
+            break;
+        case "base math operations":
+            const firstNumText = document.getElementById('firstNumInput').value.trim();
+            const secondNumText = document.getElementById('secondNumInput').value.trim();
+            
+            // Get bases
+            let firstBase = document.getElementById('firstBaseSelect').value;
+            let secondBase = document.getElementById('secondBaseSelect').value;
+            
+            // If custom base is selected, get the custom base value
+            if (firstBase === 'custom') {
+                firstBase = parseInt(document.getElementById('firstCustomBaseInput').value);
+            } else {
+                firstBase = parseInt(firstBase);
+            }
+            
+            if (secondBase === 'custom') {
+                secondBase = parseInt(document.getElementById('secondCustomBaseInput').value);
+            } else {
+                secondBase = parseInt(secondBase);
+            }
+            
+            // Check if bases are valid
+            if (firstBase < 2 || firstBase > 36 || secondBase < 2 || secondBase > 36) {
+                result = "Base must be between 2 and 36";
+                resultClass = 'text-rose-600';
+                break;
+            }
+            
+            // Check if input is valid
+            if (!firstNumText || !secondNumText) {
+                result = "Please enter both numbers";
+                resultClass = 'text-gray-600';
+                break;
+            }
+            
+            try {
+                // Convert both numbers to decimal
+                const firstNum = parseInt(firstNumText, firstBase);
+                const secondNum = parseInt(secondNumText, secondBase);
+                
+                // Get selected operation
+                const operation = document.getElementById('operationSelect').value;
+                
+                // Perform operation
+                let resultValue;
+                let operationSymbol;
+                
+                switch(operation) {
+                    case "add":
+                        resultValue = firstNum + secondNum;
+                        operationSymbol = "+";
+                        break;
+                    case "subtract":
+                        resultValue = firstNum - secondNum;
+                        operationSymbol = "-";
+                        break;
+                    case "multiply":
+                        resultValue = firstNum * secondNum;
+                        operationSymbol = "×";
+                        break;
+                    case "divide":
+                        if (secondNum === 0) {
+                            result = "Cannot divide by zero";
+                            resultClass = 'text-rose-600';
+                            return; // Exit early
+                        }
+                        resultValue = firstNum / secondNum;
+                        operationSymbol = "÷";
+                        break;
+                    case "modulo":
+                        if (secondNum === 0) {
+                            result = "Cannot perform modulo by zero";
+                            resultClass = 'text-rose-600';
+                            return; // Exit early
+                        }
+                        resultValue = firstNum % secondNum;
+                        operationSymbol = "%";
+                        break;
+                }
+                
+                // Convert result to different bases
+                const binaryResult = Math.floor(resultValue).toString(2);
+                const octalResult = Math.floor(resultValue).toString(8);
+                const decimalResult = resultValue.toString(10);
+                const hexResult = Math.floor(resultValue).toString(16).toUpperCase();
+                
+                // Format result
+                result = `${firstNumText} (Base ${firstBase}) ${operationSymbol} ${secondNumText} (Base ${secondBase}) = ${decimalResult} (Base 10)\n\n` +
+                         `Results in different bases:\n` +
+                         `Binary (Base 2): ${binaryResult}\n` +
+                         `Octal (Base 8): ${octalResult}\n` +
+                         `Decimal (Base 10): ${decimalResult}\n` +
+                         `Hexadecimal (Base 16): ${hexResult}`;
+                
+                resultClass = 'text-blue-600 whitespace-pre-line';
+            } catch (e) {
+                result = "Invalid input for the selected bases";
+                resultClass = 'text-rose-600';
+            }
             break;
         default:
             result = "Tool not implemented yet";
@@ -698,4 +1197,89 @@ function getOrdinalSuffix(n) {
         return "rd";
     }
     return "th";
+}
+
+// New function implementations
+function binaryToDecimal(binary) {
+    return parseInt(binary, 2);
+}
+
+function decimalToBinary(decimal) {
+    return decimal.toString(2);
+}
+
+function isEven(num) {
+    return num % 2 === 0;
+}
+
+function isOdd(num) {
+    return num % 2 !== 0;
+}
+
+function romanToDecimal(roman) {
+    const romanMap = {
+        'I': 1,
+        'V': 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    };
+    
+    let result = 0;
+    
+    for (let i = 0; i < roman.length; i++) {
+        const current = romanMap[roman[i]];
+        const next = romanMap[roman[i + 1]];
+        
+        if (next && current < next) {
+            result += next - current;
+            i++;
+        } else {
+            result += current;
+        }
+    }
+    
+    return result;
+}
+
+function decimalToRoman(num) {
+    const romanNumerals = [
+        { value: 1000, symbol: 'M' },
+        { value: 900, symbol: 'CM' },
+        { value: 500, symbol: 'D' },
+        { value: 400, symbol: 'CD' },
+        { value: 100, symbol: 'C' },
+        { value: 90, symbol: 'XC' },
+        { value: 50, symbol: 'L' },
+        { value: 40, symbol: 'XL' },
+        { value: 10, symbol: 'X' },
+        { value: 9, symbol: 'IX' },
+        { value: 5, symbol: 'V' },
+        { value: 4, symbol: 'IV' },
+        { value: 1, symbol: 'I' }
+    ];
+    
+    let result = '';
+    let remaining = num;
+    
+    for (const numeral of romanNumerals) {
+        while (remaining >= numeral.value) {
+            result += numeral.symbol;
+            remaining -= numeral.value;
+        }
+    }
+    
+    return result;
+}
+
+function countDigits(num) {
+    return num.toString().replace(/[^0-9]/g, '').length;
+}
+
+function baseMathOperations(num) {
+    // Implement the logic for base math operations
+    // This is a placeholder and should be replaced with the actual implementation
+    return num * 2; // Placeholder return, actual implementation needed
 }
