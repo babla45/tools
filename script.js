@@ -56,16 +56,11 @@ function initPage() {
 // Create search type toggle controls
 function createSearchTypeToggle() {
     const toggleContainer = document.createElement('div');
-    toggleContainer.className = 'search-toggle';
-    toggleContainer.style.display = 'flex';
-    toggleContainer.style.marginTop = '5px';
-    toggleContainer.style.fontSize = '14px';
+    toggleContainer.className = 'flex items-center text-sm mt-2 text-gray-600';
     
     // Create radio buttons for search type
     const subsequenceLabel = document.createElement('label');
-    subsequenceLabel.style.marginRight = '15px';
-    subsequenceLabel.style.display = 'flex';
-    subsequenceLabel.style.alignItems = 'center';
+    subsequenceLabel.className = 'flex items-center mr-4 cursor-pointer';
     
     const subsequenceRadio = document.createElement('input');
     subsequenceRadio.type = 'radio';
@@ -73,21 +68,20 @@ function createSearchTypeToggle() {
     subsequenceRadio.value = 'subsequence';
     subsequenceRadio.id = 'subsequenceSearch';
     subsequenceRadio.checked = true; // Default
-    subsequenceRadio.style.marginRight = '5px';
+    subsequenceRadio.className = 'mr-1 accent-primary';
     
     subsequenceLabel.appendChild(subsequenceRadio);
     subsequenceLabel.appendChild(document.createTextNode('Subsequence Search'));
     
     const substringLabel = document.createElement('label');
-    substringLabel.style.display = 'flex';
-    substringLabel.style.alignItems = 'center';
+    substringLabel.className = 'flex items-center cursor-pointer';
     
     const substringRadio = document.createElement('input');
     substringRadio.type = 'radio';
     substringRadio.name = 'searchType';
     substringRadio.value = 'substring';
     substringRadio.id = 'substringSearch';
-    substringRadio.style.marginRight = '5px';
+    substringRadio.className = 'mr-1 accent-primary';
     
     substringLabel.appendChild(substringRadio);
     substringLabel.appendChild(document.createTextNode('Substring Search'));
@@ -155,36 +149,19 @@ function showCustomDropdown(toolsList) {
     // Create custom dropdown
     const customDropdown = document.createElement('div');
     customDropdown.id = 'customDropdown';
-    customDropdown.style.position = 'absolute';
-    customDropdown.style.width = toolSelect.offsetWidth + 'px';
-    customDropdown.style.maxHeight = '200px';
-    customDropdown.style.overflowY = 'auto';
-    customDropdown.style.border = '1px solid #ddd';
-    customDropdown.style.borderRadius = '4px';
-    customDropdown.style.backgroundColor = 'white';
-    customDropdown.style.zIndex = '1000';
-    customDropdown.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+    customDropdown.className = 'absolute w-full max-h-48 overflow-y-auto border border-indigo-200 rounded-lg bg-white shadow-lg z-10';
     
     // Position dropdown below the search input
     const rect = toolSearch.getBoundingClientRect();
     customDropdown.style.top = (rect.bottom + window.scrollY) + 'px';
     customDropdown.style.left = (rect.left + window.scrollX) + 'px';
+    customDropdown.style.width = toolSelect.offsetWidth + 'px';
     
     // Add options to custom dropdown
     toolsList.forEach(tool => {
         const option = document.createElement('div');
         option.textContent = tool.charAt(0).toUpperCase() + tool.slice(1);
-        option.style.padding = '8px 12px';
-        option.style.cursor = 'pointer';
-        option.style.borderBottom = '1px solid #eee';
-        
-        // Highlight on hover
-        option.onmouseover = function() {
-            this.style.backgroundColor = '#f0f0f0';
-        };
-        option.onmouseout = function() {
-            this.style.backgroundColor = 'white';
-        };
+        option.className = 'p-3 cursor-pointer border-b border-indigo-50 hover:bg-indigo-50 transition-colors duration-200';
         
         // Select on click
         option.onclick = function() {
@@ -200,9 +177,7 @@ function showCustomDropdown(toolsList) {
     if (toolsList.length === 0) {
         const noResults = document.createElement('div');
         noResults.textContent = 'No matching tools found';
-        noResults.style.padding = '8px 12px';
-        noResults.style.fontStyle = 'italic';
-        noResults.style.color = '#888';
+        noResults.className = 'p-3 italic text-gray-500';
         customDropdown.appendChild(noResults);
     }
     
@@ -242,27 +217,41 @@ function updateInputArea() {
     const selectedTool = toolSelect.value;
     
     if (!selectedTool) {
-        inputArea.innerHTML = '<p>Select a tool from the dropdown to get started</p>';
+        inputArea.innerHTML = `
+            <h3 class="text-lg font-semibold text-primary mb-4">Input</h3>
+            <p class="text-gray-600">Select a tool from the dropdown to get started</p>
+        `;
         return;
     }
     
-    // Clear result
+    // Clear result with neutral styling
+    resultDisplay.className = 'text-gray-600';
     resultDisplay.textContent = '';
     
+    // Common input classes
+    const textareaClass = `w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none 
+        focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 
+        min-h-[100px] resize-y font-mono`;
+    const labelClass = 'block mb-1.5 font-medium text-gray-700';
+    
     // Set up appropriate input fields based on selected tool
+    let inputHTML = `<h3 class="text-lg font-semibold text-primary mb-4">${selectedTool.charAt(0).toUpperCase() + selectedTool.slice(1)}</h3>`;
+    
     switch(selectedTool) {
         case "prime check":
-            inputArea.innerHTML = `
-                <label for="numberInput">Enter a number:</label>
-                <input type="number" id="numberInput" placeholder="Enter a number">
+            inputHTML += `
+                <label for="numberInput" class="${labelClass}">Enter a number:</label>
+                <textarea id="numberInput" placeholder="Enter a number" class="${textareaClass}"></textarea>
             `;
+            inputArea.innerHTML = inputHTML;
             document.getElementById('numberInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
         case "leap year check":
-            inputArea.innerHTML = `
-                <label for="yearInput">Enter a year:</label>
-                <input type="number" id="yearInput" placeholder="Enter a year">
+            inputHTML += `
+                <label for="yearInput" class="${labelClass}">Enter a year:</label>
+                <textarea id="yearInput" placeholder="Enter a year" class="${textareaClass}"></textarea>
             `;
+            inputArea.innerHTML = inputHTML;
             document.getElementById('yearInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
         case "prime factorization":
@@ -271,18 +260,25 @@ function updateInputArea() {
         case "perfect number":
         case "factorial":
         case "armstrong number":
-            inputArea.innerHTML = `
-                <label for="numberInput">Enter a number:</label>
-                <input type="number" id="numberInput" placeholder="Enter a number">
+            inputHTML += `
+                <label for="numberInput" class="${labelClass}">Enter a number:</label>
+                <textarea id="numberInput" placeholder="Enter a number" class="${textareaClass}"></textarea>
             `;
+            inputArea.innerHTML = inputHTML;
             document.getElementById('numberInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
         case "sum of squares":
         case "sum of cubes":
-            inputArea.innerHTML = `
-                <label for="numberInput">Enter the limit (n):</label>
-                <input type="number" id="numberInput" placeholder="Enter a number">
+            inputHTML += `
+                <label for="numberInput" class="${labelClass}">Enter numbers (one per line or space-separated):</label>
+                <textarea id="numberInput" placeholder="Example:
+2
+3
+4
+
+Or: 2 3 4" class="${textareaClass}"></textarea>
             `;
+            inputArea.innerHTML = inputHTML;
             document.getElementById('numberInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
         case "sum of array":
@@ -291,144 +287,216 @@ function updateInputArea() {
         case "sort array ascending":
         case "sort array descending":
         case "reverse array":
-            inputArea.innerHTML = `
-                <label for="arrayInput">Enter numbers separated by commas:</label>
-                <input type="text" id="arrayInput" placeholder="e.g., 5,10,15,20">
+            inputHTML += `
+                <label for="arrayInput" class="${labelClass}">Enter numbers (one per line or space-separated):</label>
+                <textarea id="arrayInput" placeholder="Example:
+5
+10
+15
+20
+
+Or: 5 10 15 20" class="${textareaClass}"></textarea>
             `;
+            inputArea.innerHTML = inputHTML;
             document.getElementById('arrayInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
         case "fibonacci series":
-            inputArea.innerHTML = `
-                <label for="numberInput">Enter the number of terms:</label>
-                <input type="number" id="numberInput" placeholder="Enter a number">
+            inputHTML += `
+                <label for="numberInput" class="${labelClass}">Enter the number of terms:</label>
+                <textarea id="numberInput" placeholder="Enter a number" class="${textareaClass}"></textarea>
             `;
+            inputArea.innerHTML = inputHTML;
             document.getElementById('numberInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
         case "nth fibonacci number":
-            inputArea.innerHTML = `
-                <label for="numberInput">Enter the position (n):</label>
-                <input type="number" id="numberInput" placeholder="Enter a number">
+            inputHTML += `
+                <label for="numberInput" class="${labelClass}">Enter the position (n):</label>
+                <textarea id="numberInput" placeholder="Enter a number" class="${textareaClass}"></textarea>
             `;
+            inputArea.innerHTML = inputHTML;
             document.getElementById('numberInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
         case "palindrome check":
         case "reverse string":
-            inputArea.innerHTML = `
-                <label for="textInput">Enter text:</label>
-                <input type="text" id="textInput" placeholder="Enter text">
+            inputHTML += `
+                <label for="textInput" class="${labelClass}">Enter text:</label>
+                <textarea id="textInput" placeholder="Enter text" class="${textareaClass}"></textarea>
             `;
+            inputArea.innerHTML = inputHTML;
             document.getElementById('textInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
         case "reverse array of strings":
         case "sort array of strings":
-            inputArea.innerHTML = `
-                <label for="arrayInput">Enter strings separated by commas:</label>
-                <input type="text" id="arrayInput" placeholder="e.g., apple,banana,cherry">
+            inputHTML += `
+                <label for="arrayInput" class="${labelClass}">Enter strings (one per line or space-separated):</label>
+                <textarea id="arrayInput" placeholder="Example:
+apple
+banana
+cherry
+
+Or: apple banana cherry" class="${textareaClass}"></textarea>
             `;
+            inputArea.innerHTML = inputHTML;
             document.getElementById('arrayInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
         default:
-            inputArea.innerHTML = '<p>Tool not implemented yet</p>';
+            inputArea.innerHTML = `
+                <h3 class="text-lg font-semibold text-primary mb-4">Input</h3>
+                <p class="text-gray-600">Tool not implemented yet</p>
+            `;
     }
 }
 
 // Calculate and display result
 function calculateResult(tool) {
     let result;
+    let resultClass = ''; // Class for styling the result
+    
+    // Helper function to parse input that can be either space or newline separated
+    const parseInput = (input) => {
+        return input.trim().split(/[\s\n]+/);
+    };
     
     switch(tool) {
         case "prime check":
             const num = parseInt(document.getElementById('numberInput').value);
-            result = isPrime(num) ? `${num} is a prime number.` : `${num} is not a prime number.`;
+            const isPrimeResult = isPrime(num);
+            result = `${num} is ${isPrimeResult ? '' : 'not '}a prime number.`;
+            resultClass = isPrimeResult ? 'text-emerald-600' : 'text-rose-600';
             break;
         case "leap year check":
             const year = parseInt(document.getElementById('yearInput').value);
-            result = isLeapYear(year) ? `${year} is a leap year.` : `${year} is not a leap year.`;
+            const isLeapYearResult = isLeapYear(year);
+            result = `${year} is ${isLeapYearResult ? '' : 'not '}a leap year.`;
+            resultClass = isLeapYearResult ? 'text-emerald-600' : 'text-rose-600';
             break;
         case "prime factorization":
             const n = parseInt(document.getElementById('numberInput').value);
-            result = `Prime factorization of ${n}: ${primeFactorization(n).join(' × ')}`;
+            const factors = primeFactorization(n);
+            result = `Prime factorization of ${n}: ${factors.join(' × ')}`;
+            resultClass = factors.length > 0 ? 'text-blue-600' : 'text-gray-600';
             break;
         case "divisors of a number":
             const number = parseInt(document.getElementById('numberInput').value);
-            result = `Divisors of ${number}: ${getDivisors(number).join(', ')}`;
+            const divisors = getDivisors(number);
+            result = `Divisors of ${number}: ${divisors.join(', ')}`;
+            resultClass = divisors.length > 0 ? 'text-blue-600' : 'text-gray-600';
             break;
         case "sum of digits":
             const numForDigits = document.getElementById('numberInput').value;
-            result = `Sum of digits of ${numForDigits}: ${sumOfDigits(numForDigits)}`;
+            const digitSum = sumOfDigits(numForDigits);
+            result = `Sum of digits of ${numForDigits}: ${digitSum}`;
+            resultClass = digitSum > 0 ? 'text-emerald-600' : 'text-blue-600';
             break;
         case "sum of squares":
-            const limit = parseInt(document.getElementById('numberInput').value);
-            result = `Sum of squares from 1 to ${limit}: ${sumOfSquares(limit)}`;
+            const numbersForSquares = parseInput(document.getElementById('numberInput').value).map(Number);
+            const squaresSum = numbersForSquares.reduce((sum, num) => sum + num * num, 0);
+            result = `Sum of squares of [${numbersForSquares.join(', ')}]: ${squaresSum}`;
+            resultClass = squaresSum > 0 ? 'text-emerald-600' : 'text-blue-600';
             break;
         case "sum of cubes":
-            const limitForCubes = parseInt(document.getElementById('numberInput').value);
-            result = `Sum of cubes from 1 to ${limitForCubes}: ${sumOfCubes(limitForCubes)}`;
+            const numbersForCubes = parseInput(document.getElementById('numberInput').value).map(Number);
+            const cubesSum = numbersForCubes.reduce((sum, num) => sum + Math.pow(num, 3), 0);
+            result = `Sum of cubes of [${numbersForCubes.join(', ')}]: ${cubesSum}`;
+            resultClass = cubesSum > 0 ? 'text-emerald-600' : 'text-blue-600';
             break;
         case "sum of array":
-            const arrayForSum = document.getElementById('arrayInput').value.split(',').map(Number);
-            result = `Sum of array [${arrayForSum.join(', ')}]: ${sumOfArray(arrayForSum)}`;
+            const arrayForSum = parseInput(document.getElementById('arrayInput').value).map(Number);
+            const arraySum = sumOfArray(arrayForSum);
+            result = `Sum of array [${arrayForSum.join(', ')}]: ${arraySum}`;
+            resultClass = arraySum > 0 ? 'text-emerald-600' : arraySum < 0 ? 'text-rose-600' : 'text-blue-600';
             break;
         case "fibonacci series":
             const terms = parseInt(document.getElementById('numberInput').value);
-            result = `Fibonacci series (${terms} terms): ${fibonacciSeries(terms).join(', ')}`;
+            const series = fibonacciSeries(terms);
+            result = `Fibonacci series (${terms} terms): ${series.join(', ')}`;
+            resultClass = series.length > 0 ? 'text-blue-600' : 'text-gray-600';
             break;
         case "palindrome check":
             const text = document.getElementById('textInput').value;
-            result = isPalindrome(text) ? `"${text}" is a palindrome.` : `"${text}" is not a palindrome.`;
+            const isPalindromeResult = isPalindrome(text);
+            result = `"${text}" is ${isPalindromeResult ? '' : 'not '}a palindrome.`;
+            resultClass = isPalindromeResult ? 'text-emerald-600' : 'text-rose-600';
             break;
         case "armstrong number":
             const armstrongNum = parseInt(document.getElementById('numberInput').value);
-            result = isArmstrong(armstrongNum) ? `${armstrongNum} is an Armstrong number.` : `${armstrongNum} is not an Armstrong number.`;
+            const isArmstrongResult = isArmstrong(armstrongNum);
+            result = `${armstrongNum} is ${isArmstrongResult ? '' : 'not '}an Armstrong number.`;
+            resultClass = isArmstrongResult ? 'text-emerald-600' : 'text-rose-600';
             break;
         case "perfect number":
             const perfectNum = parseInt(document.getElementById('numberInput').value);
-            result = isPerfect(perfectNum) ? `${perfectNum} is a perfect number.` : `${perfectNum} is not a perfect number.`;
+            const isPerfectResult = isPerfect(perfectNum);
+            result = `${perfectNum} is ${isPerfectResult ? '' : 'not '}a perfect number.`;
+            resultClass = isPerfectResult ? 'text-emerald-600' : 'text-rose-600';
             break;
         case "factorial":
             const factNum = parseInt(document.getElementById('numberInput').value);
-            result = `Factorial of ${factNum}: ${factorial(factNum)}`;
+            const factorialResult = factorial(factNum);
+            result = `Factorial of ${factNum}: ${factorialResult}`;
+            resultClass = factorialResult > 0 ? 'text-emerald-600' : 'text-rose-600';
             break;
         case "gcd of array of number":
-            const arrayForGcd = document.getElementById('arrayInput').value.split(',').map(Number);
-            result = `GCD of [${arrayForGcd.join(', ')}]: ${gcdOfArray(arrayForGcd)}`;
+            const arrayForGcd = parseInput(document.getElementById('arrayInput').value).map(Number);
+            const gcdResult = gcdOfArray(arrayForGcd);
+            result = `GCD of [${arrayForGcd.join(', ')}]: ${gcdResult}`;
+            resultClass = gcdResult > 0 ? 'text-emerald-600' : 'text-rose-600';
             break;
         case "lcm of array of number":
-            const arrayForLcm = document.getElementById('arrayInput').value.split(',').map(Number);
-            result = `LCM of [${arrayForLcm.join(', ')}]: ${lcmOfArray(arrayForLcm)}`;
+            const arrayForLcm = parseInput(document.getElementById('arrayInput').value).map(Number);
+            const lcmResult = lcmOfArray(arrayForLcm);
+            result = `LCM of [${arrayForLcm.join(', ')}]: ${lcmResult}`;
+            resultClass = lcmResult > 0 ? 'text-emerald-600' : 'text-rose-600';
             break;
         case "nth fibonacci number":
             const position = parseInt(document.getElementById('numberInput').value);
-            result = `The ${position}${getOrdinalSuffix(position)} Fibonacci number is: ${nthFibonacci(position)}`;
+            const fibonacciResult = nthFibonacci(position);
+            result = `The ${position}${getOrdinalSuffix(position)} Fibonacci number is: ${fibonacciResult}`;
+            resultClass = fibonacciResult > 0 ? 'text-emerald-600' : 'text-rose-600';
             break;
         case "sort array ascending":
-            const arrayForAscSort = document.getElementById('arrayInput').value.split(',').map(Number);
-            result = `Sorted array (ascending): [${sortArrayAscending(arrayForAscSort).join(', ')}]`;
+            const arrayForAscSort = parseInput(document.getElementById('arrayInput').value).map(Number);
+            const sortedAsc = sortArrayAscending(arrayForAscSort);
+            result = `Sorted array (ascending): [${sortedAsc.join(', ')}]`;
+            resultClass = sortedAsc.length > 0 ? 'text-emerald-600' : 'text-blue-600';
             break;
         case "sort array descending":
-            const arrayForDescSort = document.getElementById('arrayInput').value.split(',').map(Number);
-            result = `Sorted array (descending): [${sortArrayDescending(arrayForDescSort).join(', ')}]`;
+            const arrayForDescSort = parseInput(document.getElementById('arrayInput').value).map(Number);
+            const sortedDesc = sortArrayDescending(arrayForDescSort);
+            result = `Sorted array (descending): [${sortedDesc.join(', ')}]`;
+            resultClass = sortedDesc.length > 0 ? 'text-emerald-600' : 'text-blue-600';
             break;
         case "reverse string":
             const stringToReverse = document.getElementById('textInput').value;
-            result = `Reversed string: ${reverseString(stringToReverse)}`;
+            const reversedString = reverseString(stringToReverse);
+            result = `Reversed string: ${reversedString}`;
+            resultClass = reversedString.length > 0 ? 'text-emerald-600' : 'text-blue-600';
             break;
         case "reverse array":
-            const arrayToReverse = document.getElementById('arrayInput').value.split(',').map(Number);
-            result = `Reversed array: [${reverseArray(arrayToReverse).join(', ')}]`;
+            const arrayToReverse = parseInput(document.getElementById('arrayInput').value).map(Number);
+            const reversedArray = reverseArray(arrayToReverse);
+            result = `Reversed array: [${reversedArray.join(', ')}]`;
+            resultClass = reversedArray.length > 0 ? 'text-emerald-600' : 'text-blue-600';
             break;
         case "reverse array of strings":
-            const stringArrayToReverse = document.getElementById('arrayInput').value.split(',');
-            result = `Reversed array of strings: [${reverseArrayOfStrings(stringArrayToReverse).join(', ')}]`;
+            const stringArrayToReverse = parseInput(document.getElementById('arrayInput').value);
+            const reversedStringArray = reverseArrayOfStrings(stringArrayToReverse);
+            result = `Reversed array of strings: [${reversedStringArray.join(', ')}]`;
+            resultClass = reversedStringArray.length > 0 ? 'text-emerald-600' : 'text-blue-600';
             break;
         case "sort array of strings":
-            const stringArrayToSort = document.getElementById('arrayInput').value.split(',');
-            result = `Sorted array of strings: [${sortArrayOfStrings(stringArrayToSort).join(', ')}]`;
+            const stringArrayToSort = parseInput(document.getElementById('arrayInput').value);
+            const sortedStringArray = sortArrayOfStrings(stringArrayToSort);
+            result = `Sorted array of strings: [${sortedStringArray.join(', ')}]`;
+            resultClass = sortedStringArray.length > 0 ? 'text-emerald-600' : 'text-blue-600';
             break;
         default:
             result = "Tool not implemented yet";
+            resultClass = 'text-gray-600';
     }
     
+    // Update result with styling
+    resultDisplay.className = `font-medium ${resultClass}`;
     resultDisplay.textContent = result;
 }
 
@@ -489,12 +557,13 @@ function sumOfDigits(num) {
 }
 
 function sumOfSquares(n) {
-    return (n * (n + 1) * (2 * n + 1)) / 6;
+    const numbers = Array.from({length: n}, (_, i) => i + 1);
+    return numbers.reduce((sum, num) => sum + num * num, 0);
 }
 
 function sumOfCubes(n) {
-    const sum = Math.pow((n * (n + 1)) / 2, 2);
-    return sum;
+    const numbers = Array.from({length: n}, (_, i) => i + 1);
+    return numbers.reduce((sum, num) => sum + Math.pow(num, 3), 0);
 }
 
 function sumOfArray(arr) {
