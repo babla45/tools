@@ -36,7 +36,9 @@ const tools = [
     "frequency counter",
     "character frequency",
     "unique elements",
-    "base math operations"
+    "base math operations",
+    "unit converter",
+    "encryption and decryption"
 ];
 
 // Remove duplicates from the list
@@ -402,11 +404,25 @@ Or: 5 10 15 20" class="${textareaClass}"></textarea>
                     <option value="8">Octal (Base 8)</option>
                     <option value="10" selected>Decimal (Base 10)</option>
                     <option value="16">Hexadecimal (Base 16)</option>
+                    <option value="custom">Custom Base</option>
                 </select>
+                <div id="customBaseDiv" class="hidden">
+                    <label for="customBaseInput" class="${labelClass}">Specify Custom Base (2-36):</label>
+                    <input type="number" id="customBaseInput" min="2" max="36" value="10" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
             `;
             inputArea.innerHTML = inputHTML;
             document.getElementById('numberInput').addEventListener('input', () => calculateResult(selectedTool));
-            document.getElementById('baseSelect').addEventListener('change', () => calculateResult(selectedTool));
+            document.getElementById('baseSelect').addEventListener('change', function() {
+                const customBaseDiv = document.getElementById('customBaseDiv');
+                if (this.value === 'custom') {
+                    customBaseDiv.classList.remove('hidden');
+                } else {
+                    customBaseDiv.classList.add('hidden');
+                }
+                calculateResult(selectedTool);
+            });
+            document.getElementById('customBaseInput').addEventListener('input', () => calculateResult(selectedTool));
             break;
         case "base64 encoder":
             inputHTML += `
@@ -488,7 +504,7 @@ Or: 5 10 15 20" class="${textareaClass}"></textarea>
                     <div>
                         <label for="firstNumInput" class="${labelClass}">First Number:</label>
                         <textarea id="firstNumInput" placeholder="Enter first number" class="${textareaClass}"></textarea>
-                        <label for="firstBaseSelect" class="${labelClass}">Base of first number:</label>
+                        <label for="firstBaseSelect" class="${labelClass}">Base of 1st number:</label>
                         <select id="firstBaseSelect" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                             <option value="2">Binary (Base 2)</option>
                             <option value="8">Octal (Base 8)</option>
@@ -504,7 +520,7 @@ Or: 5 10 15 20" class="${textareaClass}"></textarea>
                     <div>
                         <label for="secondNumInput" class="${labelClass}">Second Number:</label>
                         <textarea id="secondNumInput" placeholder="Enter second number" class="${textareaClass}"></textarea>
-                        <label for="secondBaseSelect" class="${labelClass}">Base of second number:</label>
+                        <label for="secondBaseSelect" class="${labelClass}">Base of 2nd number:</label>
                         <select id="secondBaseSelect" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                             <option value="2">Binary (Base 2)</option>
                             <option value="8">Octal (Base 8)</option>
@@ -569,6 +585,111 @@ Or: 5 10 15 20" class="${textareaClass}"></textarea>
             `;
             inputArea.innerHTML = inputHTML;
             document.getElementById('textInput').addEventListener('input', () => calculateResult(selectedTool));
+            break;
+        case "unit converter":
+            inputHTML += `
+                <label for="unitCategory" class="${labelClass}">Select unit category:</label>
+                <select id="unitCategory" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="length" selected>Length</option>
+                    <option value="mass">Mass/Weight</option>
+                    <option value="temperature">Temperature</option>
+                    <option value="area">Area</option>
+                    <option value="volume">Volume</option>
+                    <option value="time">Time</option>
+                    <option value="digital">Digital Storage</option>
+                    <option value="speed">Speed</option>
+                </select>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="fromUnit" class="${labelClass}">From:</label>
+                        <select id="fromUnit" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <!-- Options will be populated based on category -->
+                        </select>
+                        <label for="valueInput" class="${labelClass}">Value:</label>
+                        <input type="number" id="valueInput" placeholder="Enter value" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="toUnit" class="${labelClass}">To:</label>
+                        <select id="toUnit" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <!-- Options will be populated based on category -->
+                        </select>
+                        <div class="h-[41px] mb-3"></div> <!-- Empty space placeholder with same height as the removed button -->
+                    </div>
+                </div>
+            `;
+            inputArea.innerHTML = inputHTML;
+            
+            // Set up event listeners and populate units
+            document.getElementById('unitCategory').addEventListener('change', populateUnitOptions);
+            document.getElementById('valueInput').addEventListener('input', () => calculateResult(selectedTool));
+            document.getElementById('fromUnit').addEventListener('change', () => calculateResult(selectedTool));
+            document.getElementById('toUnit').addEventListener('change', () => calculateResult(selectedTool));
+            
+            // Initially populate unit options based on default category (length)
+            populateUnitOptions();
+            break;
+        case "encryption and decryption":
+            inputHTML += `
+                <label for="encryptionType" class="${labelClass}">Select encryption type:</label>
+                <select id="encryptionType" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="caesar" selected>Caesar Cipher</option>
+                    <option value="base64">Base64</option>
+                    <option value="rot13">ROT13</option>
+                    <option value="xor">XOR Cipher</option>
+                </select>
+                
+                <div id="encryptionOptions">
+                    <div id="caesarOptions" class="hidden">
+                        <label for="shiftAmount" class="${labelClass}">Shift amount:</label>
+                        <input type="number" id="shiftAmount" value="3" min="1" max="25" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div id="xorOptions" class="hidden">
+                        <label for="xorKey" class="${labelClass}">XOR Key:</label>
+                        <input type="text" id="xorKey" value="key" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-3">
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="radio" name="encryptMode" value="encrypt" class="mr-2 accent-primary" checked>
+                        <span>Encrypt</span>
+                    </label>
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="radio" name="encryptMode" value="decrypt" class="mr-2 accent-primary">
+                        <span>Decrypt</span>
+                    </label>
+                </div>
+                
+                <label for="encryptionInput" class="${labelClass}">Enter text:</label>
+                <textarea id="encryptionInput" placeholder="Enter text to encrypt/decrypt" class="${textareaClass}"></textarea>
+            `;
+            inputArea.innerHTML = inputHTML;
+            
+            // Set up event listeners
+            document.getElementById('encryptionType').addEventListener('change', function() {
+                updateEncryptionOptions(this.value);
+                calculateResult(selectedTool);
+            });
+            document.getElementById('encryptionInput').addEventListener('input', () => calculateResult(selectedTool));
+            document.querySelectorAll('input[name="encryptMode"]').forEach(radio => {
+                radio.addEventListener('change', () => calculateResult(selectedTool));
+            });
+            
+            // For Caesar cipher
+            const shiftAmount = document.getElementById('shiftAmount');
+            if (shiftAmount) {
+                shiftAmount.addEventListener('input', () => calculateResult(selectedTool));
+            }
+            
+            // For XOR cipher
+            const xorKey = document.getElementById('xorKey');
+            if (xorKey) {
+                xorKey.addEventListener('input', () => calculateResult(selectedTool));
+            }
+            
+            // Initialize encryption options
+            updateEncryptionOptions('caesar');
             break;
         default:
             inputArea.innerHTML = `
@@ -742,11 +863,35 @@ function calculateResult(tool) {
             break;
         case "base converter":
             const numToConvert = document.getElementById('numberInput').value.trim();
-            const originalBase = parseInt(document.getElementById('baseSelect').value);
+            let originalBase = document.getElementById('baseSelect').value;
+            
+            if (originalBase === 'custom') {
+                originalBase = parseInt(document.getElementById('customBaseInput').value);
+            } else {
+                originalBase = parseInt(originalBase);
+            }
             
             if (!numToConvert) {
                 result = "Please enter a number";
                 resultClass = 'text-gray-600';
+                break;
+            }
+            
+            if (originalBase < 2 || originalBase > 36) {
+                result = "Base must be between 2 and 36";
+                resultClass = 'text-rose-600';
+                break;
+            }
+            
+            // Validate that each digit is valid for the selected base
+            const isValidForBase = numToConvert.split('').every(digit => {
+                const digitValue = parseInt(digit, 36); // Parse in base 36 to handle letters
+                return !isNaN(digitValue) && digitValue < originalBase;
+            });
+            
+            if (!isValidForBase) {
+                result = `Invalid number for base ${originalBase}. Each digit must be less than the base.`;
+                resultClass = 'text-rose-600';
                 break;
             }
             
@@ -799,6 +944,18 @@ function calculateResult(tool) {
             
             if (fromBase < 2 || fromBase > 36 || toBase < 2 || toBase > 36) {
                 result = "Base must be between 2 and 36";
+                resultClass = 'text-rose-600';
+                break;
+            }
+            
+            // Validate that each digit is valid for the selected base
+            const isValidInput = customNumToConvert.split('').every(digit => {
+                const digitValue = parseInt(digit, 36); // Parse in base 36 to handle letters
+                return !isNaN(digitValue) && digitValue < fromBase;
+            });
+            
+            if (!isValidInput) {
+                result = `Invalid number for base ${fromBase}. Each digit must be less than the base.`;
                 resultClass = 'text-rose-600';
                 break;
             }
@@ -998,6 +1155,81 @@ function calculateResult(tool) {
                 resultClass = 'text-blue-600 whitespace-pre-line';
             } catch (e) {
                 result = "Invalid input for the selected bases";
+                resultClass = 'text-rose-600';
+            }
+            break;
+        case "unit converter":
+            const category = document.getElementById('unitCategory').value;
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+            const inputValue = parseFloat(document.getElementById('valueInput').value);
+            
+            if (isNaN(inputValue)) {
+                result = "Please enter a valid number";
+                resultClass = 'text-gray-600';
+                break;
+            }
+            
+            try {
+                const convertedValue = convertUnit(inputValue, fromUnit, toUnit, category);
+                const formattedInput = formatUnitDisplay(inputValue, fromUnit, category);
+                const formattedOutput = formatUnitDisplay(convertedValue, toUnit, category);
+                
+                result = `${formattedInput} = ${formattedOutput}`;
+                resultClass = 'text-emerald-600';
+            } catch (error) {
+                result = error.message || "Conversion error";
+                resultClass = 'text-rose-600';
+            }
+            break;
+        case "encryption and decryption":
+            const encryptionType = document.getElementById('encryptionType').value;
+            const encryptMode = document.querySelector('input[name="encryptMode"]:checked').value;
+            const textToProcess = document.getElementById('encryptionInput').value;
+            
+            if (!textToProcess) {
+                result = "Please enter text to encrypt/decrypt";
+                resultClass = 'text-gray-600';
+                break;
+            }
+            
+            try {
+                switch(encryptionType) {
+                    case 'caesar':
+                        const shift = parseInt(document.getElementById('shiftAmount').value);
+                        if (encryptMode === 'encrypt') {
+                            result = caesarCipher(textToProcess, shift);
+                        } else {
+                            result = caesarCipher(textToProcess, 26 - shift); // Decrypt with inverse shift
+                        }
+                        break;
+                    case 'base64':
+                        if (encryptMode === 'encrypt') {
+                            result = btoa(textToProcess);
+                        } else {
+                            try {
+                                result = atob(textToProcess);
+                            } catch(e) {
+                                throw new Error("Invalid Base64 string");
+                            }
+                        }
+                        break;
+                    case 'rot13':
+                        result = rot13(textToProcess); // ROT13 is its own inverse
+                        break;
+                    case 'xor':
+                        const xorKey = document.getElementById('xorKey').value;
+                        if (!xorKey) {
+                            throw new Error("XOR key cannot be empty");
+                        }
+                        // XOR is symmetric, so encrypt and decrypt are the same operation
+                        result = xorCipher(textToProcess, xorKey);
+                        break;
+                }
+                
+                resultClass = 'text-blue-600 whitespace-pre-line';
+            } catch (e) {
+                result = e.message || "Error processing text";
                 resultClass = 'text-rose-600';
             }
             break;
@@ -1309,4 +1541,384 @@ function baseMathOperations(num) {
     // Implement the logic for base math operations
     // This is a placeholder and should be replaced with the actual implementation
     return num * 2; // Placeholder return, actual implementation needed
+}
+
+function convertUnits(category, value) {
+    // Implement the logic for converting units
+    // This is a placeholder and should be replaced with the actual implementation
+    return value * 2; // Placeholder return, actual implementation needed
+}
+
+function populateUnitOptions() {
+    const category = document.getElementById('unitCategory').value;
+    const fromUnitSelect = document.getElementById('fromUnit');
+    const toUnitSelect = document.getElementById('toUnit');
+    
+    // Clear existing options
+    fromUnitSelect.innerHTML = '';
+    toUnitSelect.innerHTML = '';
+    
+    // Define units for each category
+    const units = {
+        length: [
+            { value: 'mm', label: 'Millimeter (mm)' },
+            { value: 'cm', label: 'Centimeter (cm)' },
+            { value: 'm', label: 'Meter (m)' },
+            { value: 'km', label: 'Kilometer (km)' },
+            { value: 'in', label: 'Inch (in)' },
+            { value: 'ft', label: 'Foot (ft)' },
+            { value: 'yd', label: 'Yard (yd)' },
+            { value: 'mi', label: 'Mile (mi)' }
+        ],
+        mass: [
+            { value: 'mg', label: 'Milligram (mg)' },
+            { value: 'g', label: 'Gram (g)' },
+            { value: 'kg', label: 'Kilogram (kg)' },
+            { value: 't', label: 'Metric Ton (t)' },
+            { value: 'oz', label: 'Ounce (oz)' },
+            { value: 'lb', label: 'Pound (lb)' },
+            { value: 'st', label: 'Stone (st)' }
+        ],
+        temperature: [
+            { value: 'c', label: 'Celsius (°C)' },
+            { value: 'f', label: 'Fahrenheit (°F)' },
+            { value: 'k', label: 'Kelvin (K)' }
+        ],
+        area: [
+            { value: 'mm2', label: 'Square Millimeter (mm²)' },
+            { value: 'cm2', label: 'Square Centimeter (cm²)' },
+            { value: 'm2', label: 'Square Meter (m²)' },
+            { value: 'ha', label: 'Hectare (ha)' },
+            { value: 'km2', label: 'Square Kilometer (km²)' },
+            { value: 'in2', label: 'Square Inch (in²)' },
+            { value: 'ft2', label: 'Square Foot (ft²)' },
+            { value: 'ac', label: 'Acre (ac)' },
+            { value: 'mi2', label: 'Square Mile (mi²)' }
+        ],
+        volume: [
+            { value: 'ml', label: 'Milliliter (ml)' },
+            { value: 'l', label: 'Liter (l)' },
+            { value: 'm3', label: 'Cubic Meter (m³)' },
+            { value: 'gal', label: 'Gallon (gal)' },
+            { value: 'qt', label: 'Quart (qt)' },
+            { value: 'pt', label: 'Pint (pt)' },
+            { value: 'floz', label: 'Fluid Ounce (fl oz)' },
+            { value: 'cup', label: 'Cup (cup)' },
+            { value: 'tbsp', label: 'Tablespoon (tbsp)' },
+            { value: 'tsp', label: 'Teaspoon (tsp)' }
+        ],
+        time: [
+            { value: 'ms', label: 'Millisecond (ms)' },
+            { value: 's', label: 'Second (s)' },
+            { value: 'min', label: 'Minute (min)' },
+            { value: 'h', label: 'Hour (h)' },
+            { value: 'd', label: 'Day (d)' },
+            { value: 'wk', label: 'Week (wk)' },
+            { value: 'mo', label: 'Month (mo)' },
+            { value: 'yr', label: 'Year (yr)' }
+        ],
+        digital: [
+            { value: 'b', label: 'Bit (b)' },
+            { value: 'B', label: 'Byte (B)' },
+            { value: 'KB', label: 'Kilobyte (KB)' },
+            { value: 'MB', label: 'Megabyte (MB)' },
+            { value: 'GB', label: 'Gigabyte (GB)' },
+            { value: 'TB', label: 'Terabyte (TB)' },
+            { value: 'PB', label: 'Petabyte (PB)' }
+        ],
+        speed: [
+            { value: 'mps', label: 'Meters per Second (m/s)' },
+            { value: 'kph', label: 'Kilometers per Hour (km/h)' },
+            { value: 'fps', label: 'Feet per Second (ft/s)' },
+            { value: 'mph', label: 'Miles per Hour (mph)' },
+            { value: 'kn', label: 'Knot (kn)' }
+        ]
+    };
+    
+    // Populate options
+    const selectedUnits = units[category] || [];
+    selectedUnits.forEach(unit => {
+        const fromOption = document.createElement('option');
+        fromOption.value = unit.value;
+        fromOption.textContent = unit.label;
+        fromUnitSelect.appendChild(fromOption);
+        
+        const toOption = document.createElement('option');
+        toOption.value = unit.value;
+        toOption.textContent = unit.label;
+        toUnitSelect.appendChild(toOption);
+    });
+    
+    // Select different 'to' unit if available
+    if (toUnitSelect.options.length > 1) {
+        toUnitSelect.selectedIndex = 1;
+    }
+    
+    // Trigger calculation
+    calculateResult('unit converter');
+}
+
+function convertUnit(value, fromUnit, toUnit, category) {
+    // Base units for each category
+    // For length: meters, mass: grams, temperature: celsius, etc.
+    
+    if (fromUnit === toUnit) return value;
+    
+    // Handle temperature specially due to non-linear conversions
+    if (category === 'temperature') {
+        // Convert to Celsius first
+        let celsius;
+        switch (fromUnit) {
+            case 'c': celsius = value; break;
+            case 'f': celsius = (value - 32) * 5/9; break;
+            case 'k': celsius = value - 273.15; break;
+            default: throw new Error('Unknown temperature unit');
+        }
+        
+        // Convert from Celsius to target unit
+        switch (toUnit) {
+            case 'c': return celsius;
+            case 'f': return celsius * 9/5 + 32;
+            case 'k': return celsius + 273.15;
+            default: throw new Error('Unknown temperature unit');
+        }
+    }
+    
+    // Handle other linear conversions using conversion factors
+    const conversionFactors = {
+        // Length (to meters)
+        length: {
+            mm: 0.001,
+            cm: 0.01,
+            m: 1,
+            km: 1000,
+            in: 0.0254,
+            ft: 0.3048,
+            yd: 0.9144,
+            mi: 1609.344
+        },
+        // Mass (to grams)
+        mass: {
+            mg: 0.001,
+            g: 1,
+            kg: 1000,
+            t: 1000000,
+            oz: 28.349523125,
+            lb: 453.59237,
+            st: 6350.29318
+        },
+        // Area (to square meters)
+        area: {
+            mm2: 0.000001,
+            cm2: 0.0001,
+            m2: 1,
+            ha: 10000,
+            km2: 1000000,
+            in2: 0.00064516,
+            ft2: 0.09290304,
+            ac: 4046.8564224,
+            mi2: 2589988.110336
+        },
+        // Volume (to liters)
+        volume: {
+            ml: 0.001,
+            l: 1,
+            m3: 1000,
+            gal: 3.785411784,
+            qt: 0.946352946,
+            pt: 0.473176473,
+            floz: 0.0295735296,
+            cup: 0.2365882365,
+            tbsp: 0.01478676478125,
+            tsp: 0.00492892159375
+        },
+        // Time (to seconds)
+        time: {
+            ms: 0.001,
+            s: 1,
+            min: 60,
+            h: 3600,
+            d: 86400,
+            wk: 604800,
+            mo: 2592000, // Approximated as 30 days
+            yr: 31536000 // Non-leap year (365 days)
+        },
+        // Digital (to bytes)
+        digital: {
+            b: 0.125,
+            B: 1,
+            KB: 1024,
+            MB: 1048576,
+            GB: 1073741824,
+            TB: 1099511627776,
+            PB: 1125899906842624
+        },
+        // Speed (to meters per second)
+        speed: {
+            mps: 1,
+            kph: 0.277777778,
+            fps: 0.3048,
+            mph: 0.44704,
+            kn: 0.514444444
+        }
+    };
+    
+    // Get conversion factors for the specified category
+    const factors = conversionFactors[category];
+    if (!factors) throw new Error('Unknown unit category');
+    
+    const fromFactor = factors[fromUnit];
+    const toFactor = factors[toUnit];
+    
+    if (fromFactor === undefined || toFactor === undefined) 
+        throw new Error('Unknown unit');
+    
+    // Convert to base unit, then to target unit
+    return (value * fromFactor) / toFactor;
+}
+
+function formatUnitDisplay(value, unit, category) {
+    // Format the value with appropriate unit symbol
+    let formatted = value.toLocaleString(undefined, {
+        maximumFractionDigits: 10,
+        minimumFractionDigits: 0
+    });
+    
+    const unitSymbols = {
+        // Length
+        mm: 'mm',
+        cm: 'cm',
+        m: 'm',
+        km: 'km',
+        in: 'in',
+        ft: 'ft',
+        yd: 'yd',
+        mi: 'mi',
+        // Mass
+        mg: 'mg',
+        g: 'g',
+        kg: 'kg',
+        t: 't',
+        oz: 'oz',
+        lb: 'lb',
+        st: 'st',
+        // Temperature
+        c: '°C',
+        f: '°F',
+        k: 'K',
+        // Area
+        mm2: 'mm²',
+        cm2: 'cm²',
+        m2: 'm²',
+        ha: 'ha',
+        km2: 'km²',
+        in2: 'in²',
+        ft2: 'ft²',
+        ac: 'ac',
+        mi2: 'mi²',
+        // Volume
+        ml: 'ml',
+        l: 'l',
+        m3: 'm³',
+        gal: 'gal',
+        qt: 'qt',
+        pt: 'pt',
+        floz: 'fl oz',
+        cup: 'cup',
+        tbsp: 'tbsp',
+        tsp: 'tsp',
+        // Time
+        ms: 'ms',
+        s: 's',
+        min: 'min',
+        h: 'h',
+        d: 'd',
+        wk: 'wk',
+        mo: 'mo',
+        yr: 'yr',
+        // Digital Storage
+        b: 'bit',
+        B: 'B',
+        KB: 'KB',
+        MB: 'MB',
+        GB: 'GB',
+        TB: 'TB',
+        PB: 'PB',
+        // Speed
+        mps: 'm/s',
+        kph: 'km/h',
+        fps: 'ft/s',
+        mph: 'mph',
+        kn: 'kn'
+    };
+    
+    const symbol = unitSymbols[unit] || unit;
+    return `${formatted} ${symbol}`;
+}
+
+// Function to update encryption options based on selected encryption type
+function updateEncryptionOptions(encryptionType) {
+    const caesarOptions = document.getElementById('caesarOptions');
+    const xorOptions = document.getElementById('xorOptions');
+    const decryptRadio = document.querySelector('input[name="encryptMode"][value="decrypt"]');
+    
+    // Reset options
+    caesarOptions.style.display = 'none';
+    xorOptions.style.display = 'none';
+    
+    // Show relevant options
+    switch(encryptionType) {
+        case 'caesar':
+            caesarOptions.style.display = 'block';
+            decryptRadio.disabled = false;
+            break;
+        case 'base64':
+        case 'rot13':
+            decryptRadio.disabled = false;
+            break;
+        case 'xor':
+            xorOptions.style.display = 'block';
+            decryptRadio.disabled = false;
+            break;
+    }
+}
+
+// Caesar Cipher function
+function caesarCipher(text, shift) {
+    // Ensure shift is within range 0-25
+    shift = ((shift % 26) + 26) % 26;
+    
+    return text.split('').map(char => {
+        const code = char.charCodeAt(0);
+        
+        // Uppercase letters
+        if (code >= 65 && code <= 90) {
+            return String.fromCharCode(((code - 65 + shift) % 26) + 65);
+        }
+        // Lowercase letters
+        else if (code >= 97 && code <= 122) {
+            return String.fromCharCode(((code - 97 + shift) % 26) + 97);
+        }
+        // Non-alphabetic characters
+        return char;
+    }).join('');
+}
+
+// ROT13 function
+function rot13(text) {
+    return caesarCipher(text, 13);
+}
+
+// XOR Cipher function
+function xorCipher(text, key) {
+    if (!key) return text; // If no key, return the original text
+    
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+        // XOR the character code with the key character code (repeating the key if needed)
+        const charCode = text.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+        result += String.fromCharCode(charCode);
+    }
+    
+    return result;
 }
