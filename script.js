@@ -136,7 +136,10 @@ function createSearchTypeToggle() {
 function populateToolDropdown(toolsList) {
     toolSelect.innerHTML = '<option value="" disabled selected>Select a tool</option>';
     
-    toolsList.forEach(tool => {
+    // Sort tools alphabetically
+    const sortedTools = [...toolsList].sort();
+    
+    sortedTools.forEach(tool => {
         const option = document.createElement('option');
         option.value = tool;
         option.textContent = tool.charAt(0).toUpperCase() + tool.slice(1);
@@ -559,6 +562,14 @@ Or: 5 10 15 20" class="${textareaClass}"></textarea>
                 secondCustomBaseInput.addEventListener('input', () => calculateResult(selectedTool));
             }
             break;
+        case "reverse string":
+            inputHTML += `
+                <label for="textInput" class="${labelClass}">Enter text to reverse:</label>
+                <textarea id="textInput" placeholder="Enter text" class="${textareaClass}"></textarea>
+            `;
+            inputArea.innerHTML = inputHTML;
+            document.getElementById('textInput').addEventListener('input', () => calculateResult(selectedTool));
+            break;
         default:
             inputArea.innerHTML = `
                 <h3 class="text-lg font-semibold text-primary mb-4">Input</h3>
@@ -595,6 +606,7 @@ function calculateResult(tool) {
             const factors = primeFactorization(n);
             result = `Prime factorization of ${n}: ${factors.join(' × ')}`;
             resultClass = factors.length > 0 ? 'text-blue-600' : 'text-gray-600';
+            resultDisplay.innerHTML = result;
             break;
         case "divisors of a number":
             const number = parseInt(document.getElementById('numberInput').value);
@@ -996,7 +1008,11 @@ function calculateResult(tool) {
     
     // Update result with styling
     resultDisplay.className = `font-medium ${resultClass}`;
-    resultDisplay.textContent = result;
+    if (tool === "prime factorization") {
+        resultDisplay.innerHTML = result;
+    } else {
+        resultDisplay.textContent = result;
+    }
 }
 
 // Function implementations
@@ -1033,7 +1049,18 @@ function primeFactorization(n) {
         }
     }
     
-    return factors;
+    // Group factors and count occurrences
+    const factorCounts = {};
+    factors.forEach(factor => {
+        factorCounts[factor] = (factorCounts[factor] || 0) + 1;
+    });
+    
+    // Format as factor with superscript for exponents
+    const formattedFactors = Object.entries(factorCounts).map(([factor, count]) => {
+        return count === 1 ? `${factor}` : `${factor}<sup>${count}</sup>`;
+    });
+    
+    return formattedFactors;
 }
 
 function getDivisors(n) {
