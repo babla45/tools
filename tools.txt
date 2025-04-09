@@ -1,23 +1,39 @@
-prime check
-leap year check
-prime factorization
-divisors of a number
-sum of digits
-sum of squares
-sum of cubes
-sum of array
-fibonacci series
-palindrome check
-armstrong number
-perfect number
-factorial
-gcd of array of number
-lcm of array of number
-fibonacci series
-nth fibonacci number
-sort array ascending
-sort array descending
-reverse string
-reverse array
-reverse array of strings
-sort array of strings
+prime check,
+leap year check,
+prime factorization,
+divisors of a number,
+sum of digits,
+sum of squares,
+sum of cubes,
+sum of array,
+fibonacci series,
+palindrome check,
+armstrong number,
+perfect number,
+factorial,
+gcd of array of number,
+lcm of array of number,
+nth fibonacci number,
+sort array ascending,
+sort array descending,
+reverse string,
+reverse array,
+reverse array of strings,
+sort array of strings,
+roman to decimal,
+decimal to roman,
+count digits,
+greatest in array,
+smallest in array,
+average of array,
+base converter,
+base64 encoder,
+base64 decoder,
+custom base converter,
+set operations,
+frequency counter,
+character frequency,
+unique elements,
+base math operations,
+unit converter,
+encryption and decryption

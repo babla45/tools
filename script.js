@@ -38,7 +38,9 @@ const tools = [
     "unique elements",
     "base math operations",
     "unit converter",
-    "encryption and decryption"
+    "encryption and decryption",
+    "polynomial roots",
+    "matrix operations" // Added new tool
 ];
 
 // Remove duplicates from the list
@@ -691,12 +693,171 @@ Or: 5 10 15 20" class="${textareaClass}"></textarea>
             // Initialize encryption options
             updateEncryptionOptions('caesar');
             break;
+        case "polynomial roots":
+            inputHTML += `
+                <label for="polynomialInput" class="${labelClass}">Enter polynomial coefficients:</label>
+                <textarea id="polynomialInput" placeholder="Enter coefficients from highest to lowest degree, one per line or space-separated.
+Example for 2x² + 3x - 5:
+2
+3
+-5" class="${textareaClass}"></textarea>
+                <div class="text-gray-600 text-sm mb-3">
+                    <p>Enter the coefficients of the polynomial from highest to lowest degree.</p>
+                    <p>For example, for 2x² + 3x - 5, enter: 2, 3, -5</p>
+                </div>
+            `;
+            inputArea.innerHTML = inputHTML;
+            document.getElementById('polynomialInput').addEventListener('input', () => calculateResult(selectedTool));
+            break;
+        case "matrix operations":
+            inputHTML += `
+                <div class="mb-4">
+                    <label for="operationSelect" class="${labelClass}">Select matrix operation:</label>
+                    <select id="operationSelect" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="add" selected>Addition (A + B)</option>
+                        <option value="subtract">Subtraction (A - B)</option>
+                        <option value="multiply">Multiplication (A × B)</option>
+                        <option value="determinant">Determinant (|A|)</option>
+                        <option value="inverse">Inverse (A⁻¹)</option>
+                        <option value="transpose">Transpose (Aᵀ)</option>
+                        <option value="trace">Trace (tr(A))</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-6">
+                    <div id="matrixASection">
+                        <h4 class="font-semibold mb-2">Matrix A</h4>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <div>
+                                <label for="matrixARows" class="${labelClass}">Rows:</label>
+                                <input type="number" id="matrixARows" value="2" min="1" max="10" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg">
+                            </div>
+                            <div>
+                                <label for="matrixACols" class="${labelClass}">Columns:</label>
+                                <input type="number" id="matrixACols" value="2" min="1" max="10" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg">
+                            </div>
+                        </div>
+                        <textarea id="matrixAInput" placeholder="Enter values (space or comma-separated):
+1 2
+3 4" class="${textareaClass}"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Enter values row by row, space or comma-separated.</p>
+                    </div>
+                    
+                    <div id="matrixBSection">
+                        <h4 class="font-semibold mb-2">Matrix B</h4>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <div>
+                                <label for="matrixBRows" class="${labelClass}">Rows:</label>
+                                <input type="number" id="matrixBRows" value="2" min="1" max="10" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg">
+                            </div>
+                            <div>
+                                <label for="matrixBCols" class="${labelClass}">Columns:</label>
+                                <input type="number" id="matrixBCols" value="2" min="1" max="10" class="w-full p-2.5 mb-3 border-2 border-indigo-200 rounded-lg">
+                            </div>
+                        </div>
+                        <textarea id="matrixBInput" placeholder="Enter values (space or comma-separated):
+5 6
+7 8" class="${textareaClass}"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Enter values row by row, space or comma-separated.</p>
+                    </div>
+                </div>
+            `;
+            
+            inputArea.innerHTML = inputHTML;
+            
+            // Set up event listeners
+            document.getElementById('operationSelect').addEventListener('change', function() {
+                const operation = this.value;
+                const matrixBSection = document.getElementById('matrixBSection');
+                
+                // Show/hide matrix B based on operation
+                if (['determinant', 'inverse', 'transpose', 'trace'].includes(operation)) {
+                    matrixBSection.style.display = 'none';
+                } else {
+                    matrixBSection.style.display = 'block';
+                }
+                
+                calculateResult('matrix operations');
+            });
+            
+            document.getElementById('matrixARows').addEventListener('input', () => calculateResult('matrix operations'));
+            document.getElementById('matrixACols').addEventListener('input', () => calculateResult('matrix operations'));
+            document.getElementById('matrixBRows').addEventListener('input', () => calculateResult('matrix operations'));
+            document.getElementById('matrixBCols').addEventListener('input', () => calculateResult('matrix operations'));
+            document.getElementById('matrixAInput').addEventListener('input', () => calculateResult('matrix operations'));
+            document.getElementById('matrixBInput').addEventListener('input', () => calculateResult('matrix operations'));
+            
+            break;
         default:
             inputArea.innerHTML = `
                 <h3 class="text-lg font-semibold text-primary mb-4">Input</h3>
                 <p class="text-gray-600">Tool not implemented yet</p>
             `;
     }
+}
+
+// Function to convert a number to superscript
+function toSuperscript(num) {
+    const superscripts = {
+        '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+        '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
+        '-': '⁻', '+': '⁺'
+    };
+    
+    return num.toString().split('').map(char => superscripts[char] || char).join('');
+}
+
+// Function to describe the polynomial in human-readable form
+function describePolynomial(coeffs) {
+    if (coeffs.length === 0) return "0";
+    
+    let terms = [];
+    const degree = coeffs.length - 1;
+    
+    for (let i = 0; i <= degree; i++) {
+        const coeff = coeffs[i];
+        if (coeff === 0) continue;
+        
+        const power = degree - i;
+        let term = '';
+        
+        // Handle the coefficient
+        if (power === 0) {
+            // Constant term
+            term = coeff.toString();
+        } else {
+            // Non-constant term
+            if (Math.abs(coeff) === 1) {
+                term = coeff < 0 ? '-' : '';
+            } else {
+                term = coeff.toString();
+            }
+            
+            // Add the variable with correct power
+            if (power === 1) {
+                term += 'x';
+            } else {
+                term += 'x' + toSuperscript(power); // Use superscript
+            }
+        }
+        
+        terms.push(term);
+    }
+    
+    if (terms.length === 0) return "0";
+    
+    // Join terms with + or - signs
+    let result = terms[0];
+    for (let i = 1; i < terms.length; i++) {
+        const term = terms[i];
+        if (term[0] === '-') {
+            result += ' ' + term;
+        } else {
+            result += ' + ' + term;
+        }
+    }
+    
+    return result;
 }
 
 // Calculate and display result
@@ -1230,6 +1391,130 @@ function calculateResult(tool) {
                 resultClass = 'text-blue-600 whitespace-pre-line';
             } catch (e) {
                 result = e.message || "Error processing text";
+                resultClass = 'text-rose-600';
+            }
+            break;
+        case "polynomial roots":
+            const polynomialCoeffs = parseInput(document.getElementById('polynomialInput').value).map(Number);
+            
+            if (polynomialCoeffs.length <= 1) {
+                result = "Please enter coefficients for a valid polynomial";
+                resultClass = 'text-gray-600';
+                break;
+            }
+            
+            try {
+                const degree = polynomialCoeffs.length - 1;
+                const polyDesc = describePolynomial(polynomialCoeffs);
+                const roots = findPolynomialRoots(polynomialCoeffs);
+                
+                // Format the result
+                result = `Polynomial: ${polyDesc}\nDegree: ${degree}\n\nRoots:`;
+                
+                if (roots.length === 0) {
+                    result += "\nNo real or simple roots found.";
+                } else {
+                    roots.forEach((root, i) => {
+                        if (typeof root === 'object' && root.re !== undefined) {
+                            // Complex root
+                            const re = root.re.toFixed(4).replace(/\.0000$/, '');
+                            const im = Math.abs(root.im).toFixed(4).replace(/\.0000$/, '');
+                            const sign = root.im < 0 ? '-' : '+';
+                            result += `\nx${i+1} = ${re} ${sign} ${im}i`;
+                        } else {
+                            // Real root
+                            result += `\nx${i+1} = ${root.toFixed(4).replace(/\.0000$/, '')}`;
+                        }
+                    });
+                }
+                
+                resultClass = 'text-blue-600 whitespace-pre-line';
+            } catch (e) {
+                result = `Error finding roots: ${e.message}`;
+                resultClass = 'text-rose-600';
+            }
+            break;
+        case "matrix operations":
+            const operation = document.getElementById('operationSelect').value;
+            const matrixARows = parseInt(document.getElementById('matrixARows').value);
+            const matrixACols = parseInt(document.getElementById('matrixACols').value);
+            const matrixBRows = parseInt(document.getElementById('matrixBRows').value);
+            const matrixBCols = parseInt(document.getElementById('matrixBCols').value);
+            
+            // Parse matrices from input
+            const matrixA = parseMatrix(document.getElementById('matrixAInput').value, matrixARows, matrixACols);
+            
+            try {
+                let resultMatrix;
+                let resultText;
+                
+                switch(operation) {
+                    case "add":
+                        const matrixB_add = parseMatrix(document.getElementById('matrixBInput').value, matrixBRows, matrixBCols);
+                        if (matrixARows !== matrixBRows || matrixACols !== matrixBCols) {
+                            throw new Error("Matrices must have the same dimensions for addition.");
+                        }
+                        resultMatrix = matrixAddition(matrixA, matrixB_add);
+                        resultText = `Result of A + B:\n${formatMatrix(resultMatrix)}`;
+                        break;
+                        
+                    case "subtract":
+                        const matrixB_sub = parseMatrix(document.getElementById('matrixBInput').value, matrixBRows, matrixBCols);
+                        if (matrixARows !== matrixBRows || matrixACols !== matrixBCols) {
+                            throw new Error("Matrices must have the same dimensions for subtraction.");
+                        }
+                        resultMatrix = matrixSubtraction(matrixA, matrixB_sub);
+                        resultText = `Result of A - B:\n${formatMatrix(resultMatrix)}`;
+                        break;
+                        
+                    case "multiply":
+                        const matrixB_mul = parseMatrix(document.getElementById('matrixBInput').value, matrixBRows, matrixBCols);
+                        if (matrixACols !== matrixBRows) {
+                            throw new Error("Number of columns in Matrix A must equal number of rows in Matrix B for multiplication.");
+                        }
+                        resultMatrix = matrixMultiplication(matrixA, matrixB_mul);
+                        resultText = `Result of A × B:\n${formatMatrix(resultMatrix)}`;
+                        break;
+                        
+                    case "determinant":
+                        if (matrixARows !== matrixACols) {
+                            throw new Error("Matrix must be square to calculate determinant.");
+                        }
+                        const det = matrixDeterminant(matrixA);
+                        resultText = `Determinant of A: ${det.toFixed(4)}`;
+                        break;
+                        
+                    case "inverse":
+                        if (matrixARows !== matrixACols) {
+                            throw new Error("Matrix must be square to calculate inverse.");
+                        }
+                        const det_inv = matrixDeterminant(matrixA);
+                        if (Math.abs(det_inv) < 1e-10) {
+                            throw new Error("Matrix is not invertible (determinant is zero).");
+                        }
+                        resultMatrix = matrixInverse(matrixA);
+                        resultText = `Inverse of A:\n${formatMatrix(resultMatrix)}`;
+                        break;
+                        
+                    case "transpose":
+                        resultMatrix = matrixTranspose(matrixA);
+                        resultText = `Transpose of A:\n${formatMatrix(resultMatrix)}`;
+                        break;
+                        
+                    case "trace":
+                        if (matrixARows !== matrixACols) {
+                            throw new Error("Matrix must be square to calculate trace.");
+                        }
+                        const trace = matrixTrace(matrixA);
+                        resultText = `Trace of A: ${trace.toFixed(4)}`;
+                        break;
+                }
+                
+                result = resultText;
+                resultClass = 'text-blue-600 whitespace-pre font-mono';
+                
+            } catch (error) {
+                result = `Error: ${error.message}`;
                 resultClass = 'text-rose-600';
             }
             break;
@@ -1921,4 +2206,384 @@ function xorCipher(text, key) {
     }
     
     return result;
+}
+
+// Function to find roots of a polynomial
+function findPolynomialRoots(coeffs) {
+    // Remove leading zeros
+    while (coeffs.length > 1 && coeffs[0] === 0) {
+        coeffs.shift();
+    }
+    
+    const degree = coeffs.length - 1;
+    
+    // Handle special cases
+    if (degree === 0) {
+        return []; // Constant polynomial, no roots
+    }
+    
+    if (degree === 1) {
+        // Linear equation: ax + b = 0
+        return [-coeffs[1] / coeffs[0]];
+    }
+    
+    if (degree === 2) {
+        // Quadratic equation: ax² + bx + c = 0
+        const a = coeffs[0];
+        const b = coeffs[1];
+        const c = coeffs[2];
+        
+        const discriminant = b*b - 4*a*c;
+        
+        if (discriminant > 0) {
+            // Two real roots
+            const sqrtD = Math.sqrt(discriminant);
+            return [(-b + sqrtD) / (2*a), (-b - sqrtD) / (2*a)];
+        } else if (discriminant === 0) {
+            // One real root (double root)
+            return [-b / (2*a)];
+        } else {
+            // Complex roots
+            const realPart = -b / (2*a);
+            const imagPart = Math.sqrt(-discriminant) / (2*a);
+            return [
+                {re: realPart, im: imagPart},
+                {re: realPart, im: -imagPart}
+            ];
+        }
+    }
+    
+    // For higher degree polynomials, use Durand-Kerner method
+    return durandKernerMethod(coeffs);
+}
+
+// Durand-Kerner method for finding complex roots of polynomials
+function durandKernerMethod(coeffs) {
+    const degree = coeffs.length - 1;
+    
+    // Normalize the polynomial so the leading coefficient is 1
+    const normalizedCoeffs = coeffs.map(c => c / coeffs[0]);
+    
+    // Function to evaluate the polynomial at a point z
+    function evaluatePolynomial(z, coeffs) {
+        let result = {re: 0, im: 0};
+        let power = {re: 1, im: 0}; // z^0 = 1
+        
+        for (let i = coeffs.length - 1; i >= 0; i--) {
+            // Add c_i * z^(n-i) to result
+            result.re += coeffs[i] * power.re;
+            result.im += coeffs[i] * power.im;
+            
+            // Compute next power of z (z^(n-i+1))
+            if (i > 0) {
+                const nextRe = power.re * z.re - power.im * z.im;
+                const nextIm = power.re * z.im + power.im * z.re;
+                power.re = nextRe;
+                power.im = nextIm;
+            }
+        }
+        
+        return result;
+    }
+    
+    // Function to compute complex division
+    function complexDivide(a, b) {
+        const denominator = b.re * b.re + b.im * b.im;
+        return {
+            re: (a.re * b.re + a.im * b.im) / denominator,
+            im: (a.im * b.re - a.re * b.im) / denominator
+        };
+    }
+    
+    // Function to compute complex subtraction
+    function complexSubtract(a, b) {
+        return {re: a.re - b.re, im: a.im - b.im};
+    }
+    
+    // Function to compute complex multiplication
+    function complexMultiply(a, b) {
+        return {
+            re: a.re * b.re - a.im * b.im,
+            im: a.re * b.im + a.im * b.re
+        };
+    }
+    
+    // Initial approximations
+    const roots = [];
+    for (let i = 0; i < degree; i++) {
+        const angle = 2 * Math.PI * i / degree;
+        roots.push({
+            re: 0.4 * Math.cos(angle),
+            im: 0.4 * Math.sin(angle)
+        });
+    }
+    
+    // Maximum number of iterations and convergence tolerance
+    const maxIterations = 100;
+    const tolerance = 1e-10;
+    
+    // Iterative improvement of approximations
+    for (let iter = 0; iter < maxIterations; iter++) {
+        let maxChange = 0;
+        
+        for (let i = 0; i < degree; i++) {
+            // Compute P(roots[i])
+            const p = evaluatePolynomial(roots[i], normalizedCoeffs);
+            
+            // Compute denominator: product of (roots[i] - roots[j]) for j != i
+            let denominator = {re: 1, im: 0};
+            for (let j = 0; j < degree; j++) {
+                if (j !== i) {
+                    denominator = complexMultiply(denominator, 
+                        complexSubtract(roots[i], roots[j]));
+                }
+            }
+            
+            // Compute correction term: P(roots[i]) / denominator
+            const correction = complexDivide(p, denominator);
+            
+            // Update roots[i]
+            const newRoot = complexSubtract(roots[i], correction);
+            
+            // Track the maximum change
+            const change = Math.sqrt(
+                Math.pow(newRoot.re - roots[i].re, 2) + 
+                Math.pow(newRoot.im - roots[i].im, 2)
+            );
+            maxChange = Math.max(maxChange, change);
+            
+            // Update the root
+            roots[i] = newRoot;
+        }
+        
+        // Check for convergence
+        if (maxChange < tolerance) {
+            break;
+        }
+    }
+    
+    // Convert roots with very small imaginary parts to real roots
+    const finalRoots = roots.map(root => {
+        if (Math.abs(root.im) < 1e-10) {
+            return root.re;
+        }
+        return root;
+    });
+    
+    return finalRoots;
+}
+
+// Parse matrix from string input
+function parseMatrix(input, rows, cols) {
+    const lines = input.trim().split(/\n+/);
+    const matrix = [];
+    
+    for (let i = 0; i < rows; i++) {
+        const rowValues = (i < lines.length ? lines[i] : "").split(/[\s,]+/).filter(v => v !== "");
+        const row = [];
+        
+        for (let j = 0; j < cols; j++) {
+            // Use 0 if value is missing
+            row.push(j < rowValues.length ? parseFloat(rowValues[j]) : 0);
+        }
+        
+        matrix.push(row);
+    }
+    
+    return matrix;
+}
+
+// Update the formatMatrix function to improve matrix display
+function formatMatrix(matrix) {
+    const rows = matrix.length;
+    const cols = matrix[0].length;
+    
+    // Find the maximum string length for alignment
+    let maxLength = 0;
+    const formattedValues = [];
+    
+    for (let i = 0; i < rows; i++) {
+        formattedValues[i] = [];
+        for (let j = 0; j < cols; j++) {
+            // Round to 4 decimal places and remove trailing zeros
+            const val = parseFloat(matrix[i][j].toFixed(4));
+            const formatted = val.toString();
+            formattedValues[i][j] = formatted;
+            maxLength = Math.max(maxLength, formatted.length);
+        }
+    }
+    
+    // Build the matrix with proper alignment
+    let result = "";
+    
+    for (let i = 0; i < rows; i++) {
+        result += "│ ";
+        for (let j = 0; j < cols; j++) {
+            // Pad the value for alignment
+            const padded = formattedValues[i][j].padStart(maxLength);
+            result += padded + " ";
+        }
+        result += "│\n";
+    }
+    
+    return result;
+}
+
+// Matrix addition
+function matrixAddition(A, B) {
+    const result = [];
+    
+    for (let i = 0; i < A.length; i++) {
+        const row = [];
+        for (let j = 0; j < A[0].length; j++) {
+            row.push(A[i][j] + B[i][j]);
+        }
+        result.push(row);
+    }
+    
+    return result;
+}
+
+// Matrix subtraction
+function matrixSubtraction(A, B) {
+    const result = [];
+    
+    for (let i = 0; i < A.length; i++) {
+        const row = [];
+        for (let j = 0; j < A[0].length; j++) {
+            row.push(A[i][j] - B[i][j]);
+        }
+        result.push(row);
+    }
+    
+    return result;
+}
+
+// Matrix multiplication
+function matrixMultiplication(A, B) {
+    const result = [];
+    
+    for (let i = 0; i < A.length; i++) {
+        const row = [];
+        for (let j = 0; j < B[0].length; j++) {
+            let sum = 0;
+            for (let k = 0; k < A[0].length; k++) {
+                sum += A[i][k] * B[k][j];
+            }
+            row.push(sum);
+        }
+        result.push(row);
+    }
+    
+    return result;
+}
+
+// Matrix determinant using recursive method
+function matrixDeterminant(A) {
+    const n = A.length;
+    
+    // Base case for 1x1 matrix
+    if (n === 1) return A[0][0];
+    
+    // Base case for 2x2 matrix
+    if (n === 2) return A[0][0] * A[1][1] - A[0][1] * A[1][0];
+    
+    let determinant = 0;
+    
+    // Expand by first row
+    for (let j = 0; j < n; j++) {
+        // Create submatrix by removing first row and column j
+        const submatrix = [];
+        for (let i = 1; i < n; i++) {
+            const row = [];
+            for (let k = 0; k < n; k++) {
+                if (k !== j) row.push(A[i][k]);
+            }
+            submatrix.push(row);
+        }
+        
+        // Add to determinant with alternating signs
+        const sign = j % 2 === 0 ? 1 : -1;
+        determinant += sign * A[0][j] * matrixDeterminant(submatrix);
+    }
+    
+    return determinant;
+}
+
+// Matrix inverse using adjugate method
+function matrixInverse(A) {
+    const n = A.length;
+    
+    // For 1x1 matrix, inverse is 1/A[0][0]
+    if (n === 1) return [[1 / A[0][0]]];
+    
+    // Calculate determinant
+    const det = matrixDeterminant(A);
+    
+    // Calculate cofactor matrix
+    const cofactors = [];
+    for (let i = 0; i < n; i++) {
+        const cofactorRow = [];
+        for (let j = 0; j < n; j++) {
+            // Create submatrix by removing row i and column j
+            const submatrix = [];
+            for (let k = 0; k < n; k++) {
+                if (k !== i) {
+                    const row = [];
+                    for (let l = 0; l < n; l++) {
+                        if (l !== j) row.push(A[k][l]);
+                    }
+                    submatrix.push(row);
+                }
+            }
+            
+            // Calculate minor and multiply by (-1)^(i+j)
+            const sign = (i + j) % 2 === 0 ? 1 : -1;
+            cofactorRow.push(sign * matrixDeterminant(submatrix));
+        }
+        cofactors.push(cofactorRow);
+    }
+    
+    // Transpose cofactor matrix to get adjugate
+    const adjugate = matrixTranspose(cofactors);
+    
+    // Divide adjugate by determinant
+    const inverse = [];
+    for (let i = 0; i < n; i++) {
+        const row = [];
+        for (let j = 0; j < n; j++) {
+            row.push(adjugate[i][j] / det);
+        }
+        inverse.push(row);
+    }
+    
+    return inverse;
+}
+
+// Matrix transpose
+function matrixTranspose(A) {
+    const rows = A.length;
+    const cols = A[0].length;
+    
+    const result = [];
+    for (let j = 0; j < cols; j++) {
+        const newRow = [];
+        for (let i = 0; i < rows; i++) {
+            newRow.push(A[i][j]);
+        }
+        result.push(newRow);
+    }
+    
+    return result;
+}
+
+// Matrix trace (sum of diagonal elements)
+function matrixTrace(A) {
+    let trace = 0;
+    
+    for (let i = 0; i < A.length; i++) {
+        trace += A[i][i];
+    }
+    
+    return trace;
 }
